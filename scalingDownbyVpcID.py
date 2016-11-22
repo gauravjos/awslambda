@@ -9,6 +9,10 @@ vfilters = [{
 }]
 
 ASresponse = asclient.describe_auto_scaling_groups()
-print ASresponse
+if not ASresponse['AutoScalingGroups']:
+ 	print "No Scaling groups Present"
+else:
+	print "Scaling Groups Present"
+
 
 
