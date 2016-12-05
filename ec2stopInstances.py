@@ -5,7 +5,6 @@ import boto3
 #ec2 = boto3.resource('ec2')
 regions = boto3.client('ec2').describe_regions()
 for reg in regions['Regions']:
- 	print reg['RegionName']
  	client = boto3.client('ec2',region_name=reg['RegionName'])
  	filters = [{  'Name': 'tag:Name','Values': ['*']}]
  	instanceIds=[]
@@ -13,8 +12,7 @@ for reg in regions['Regions']:
  	for out in response['Reservations']:
  		for insts in out['Instances']:
  			instanceIds.append(insts['InstanceId'])
- 	print len(instanceIds), reg['RegionName']
- 	# if(len(instanceIds)>0):
- 	#     output=client.stop_instances(InstanceIds=instanceIds)
+ 	if(len(instanceIds)>0):
+ 		output=client.stop_instances(InstanceIds=instanceIds)
 
 # print output['StoppingInstances']
