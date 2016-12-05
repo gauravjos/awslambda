@@ -6,7 +6,7 @@ import boto3
 regions = boto3.client('ec2').describe_regions()
 for reg in regions['Regions']:
  	client = boto3.client('ec2',region_name=reg['RegionName'])
- 	filters = [{  'Name': 'tag:Name','Values': ['*']}]
+ 	filters = [{  'Name': 'instance-state-name','Values': ['running']}]
  	instanceIds=[]
  	response = client.describe_instances(Filters=filters)
  	for out in response['Reservations']:
