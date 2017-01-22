@@ -6,7 +6,9 @@ import os
 
 url = "https://www.youtube.com/watch?v=LvwQDenTgw8"
 bucket='lambda-youtube-mp3'
+region = "us-west-2"
 client= boto3.client('s3')
+
 class MyLogger(object):
     def debug(self, msg):
         pass
@@ -22,7 +24,6 @@ def upload(d):
 	filepath = "/tmp/{0}".format(filename)
 	client.upload_file(filepath, bucket, filename)
 	client.put_object_acl(ACL='private', Bucket=bucket, Key=filename)
-	region = "us-west-2"
 	return "https://s3-{0}.amazonaws.com/{1}/{2}".format(region, bucket, filename)
 
 
@@ -31,8 +32,8 @@ def my_hook(d):
         print('Done downloading, now converting ...')
         
 
-
-ydl_opts = {
+def run(event, context):
+	ydl_opts = {
     'outtmpl': '/tmp/%(title)s-%(id)s.%(ext)s',
     'format': 'bestaudio/best',
     'postprocessors': [{
@@ -43,12 +44,10 @@ ydl_opts = {
     'logger': MyLogger(),
     'progress_hooks': [my_hook],
     'ffmpeg_location': 'ffmpeg/',
-}
-with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-    #ydl.download([url])
-    ydl.add_default_info_extractors()
-    info = ydl.extract_info(url, True)
-
-response = upload(info)
-
-print response
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        #ydl.download([url])
+        ydl.add_default_info_extractors()
+        info = ydl.extract_info(url, True)
+    response = upload(info)
+    return { "url" : response }
