@@ -33,6 +33,7 @@ def my_hook(d):
         
 
 def run(event, context):
+	url = event[url] ### Need to be changed for Api Gateway POST request
 	ydl_opts = {
     'outtmpl': '/tmp/%(title)s-%(id)s.%(ext)s',
     'format': 'bestaudio/best',
