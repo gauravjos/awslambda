@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import youtube_dl
+from youtube_dl import YoutubeDL
 import boto3
 import os
 
@@ -31,24 +31,22 @@ def my_hook(d):
     if d['status'] == 'finished':
         print('Done downloading, now converting ...')
         
-
-def run(event, context):
-	url = event[url] ### Need to be changed for Api Gateway POST request
+def lambda_handler(event, context):
+	url = event['url']### Need to be changed for Api Gateway POST request
 	ydl_opts = {
-    'outtmpl': '/tmp/%(title)s-%(id)s.%(ext)s',
-    'format': 'bestaudio/best',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': '192',
-    }],
-    'logger': MyLogger(),
-    'progress_hooks': [my_hook],
-    'ffmpeg_location': 'ffmpeg/',
-    }
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        #ydl.download([url])
-        ydl.add_default_info_extractors()
-        info = ydl.extract_info(url, True)
-    response = upload(info)
-    return { "url" : response }
+		'outtmpl': '/tmp/%(title)s-%(id)s.%(ext)s',
+		'format': 'bestaudio/best',
+		'postprocessors': [{
+			'key': 'FFmpegExtractAudio',
+			'preferredcodec': 'mp3',
+			'preferredquality': '192',
+		}],
+		'logger': MyLogger(),
+		'progress_hooks': [my_hook],
+		'ffmpeg_location': 'ffmpeg/',
+	}
+	ydl = YoutubeDL(ydl_opts)
+	ydl.add_default_info_extractors()
+	info = ydl.extract_info(url, True)
+	response = upload(info)
+	return { "url" : response }
